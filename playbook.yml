@@ -1,0 +1,30 @@
+- name: Instalacion de docker y docker-compose
+  hosts: vagrant-machine
+  become: true
+  pre_tasks:
+    - name: actualizacion de las dependencias, eliminacion de paquetes inutiles y que no se usan
+      apt:
+        update_cache: true
+        cache_valid_time: 3600
+        autoclean: true
+        autoremove: true
+  roles:
+    - role: geerlingguy.docker
+  tasks:
+    - name: instalacion de git
+      apt:
+        name: git
+        state: present
+    - name: Ensure group docker exists
+      group:
+        name: docker
+        state: present
+        system: true
+    - name: Add the user 'vagrant' to a docker group
+      user:
+        name: vagrant
+        group: docker
+    # - name: cargamos la imagen de docker de meteor
+    #   docker_image:
+    #     name: assetsagacity/meteor-do
+  
