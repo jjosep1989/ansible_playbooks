@@ -1,30 +1,52 @@
-- name: Instalacion de docker y docker-compose
-  hosts: vagrant-machine
+- name: Instalacion de docker
+  hosts: dev-server-0
   become: true
-  pre_tasks:
-    - name: actualizacion de las dependencias, eliminacion de paquetes inutiles y que no se usan
+  pre_tasks:    
+    - name: Actualizacion de las dependencias, eliminacion de paquetes inutiles y que no se usan
       apt:
         update_cache: true
         cache_valid_time: 3600
         autoclean: true
         autoremove: true
-  roles:
-    - role: geerlingguy.docker
-  tasks:
-    - name: instalacion de git
+    - name: Actualizacion de distribucion
       apt:
-        name: git
-        state: present
-    - name: Ensure group docker exists
-      group:
-        name: docker
-        state: present
-        system: true
-    - name: Add the user 'vagrant' to a docker group
+        upgrade: dist
+        cache_valid_time: 3600
+    #pendiente reinicio despues de actualizar
+    #https://www.cyberciti.biz/faq/ansible-reboot-debian-ubuntu-linux-for-kernel-update-waitforit/
+    #https://www.jeffgeerling.com/blog/2018/reboot-and-wait-reboot-complete-ansible-playbook
+  vars:
+    pip_install_packages:
+      - name: docker      
+    pip_package: python3-pip
+  roles:
+    - role: geerlingguy.pip
+    - role: geerlingguy.docker
+      #docker_apt_arch: armhf  #not arm64
+    - role: oefenweb.swapfile
+      swapfile_size: 3GB
+      swapfile_swappiness: 70
+  tasks:
+    - name: Instalacion de htop
+      apt:
+        name: htop
+    - name: Adición el usuario root al grupo docker 
       user:
-        name: vagrant
-        group: docker
-    # - name: cargamos la imagen de docker de meteor
-    #   docker_image:
-    #     name: assetsagacity/meteor-do
-  
+        name: root
+        group: docker        
+    - name: Creacion del contenedor de gitlab
+      docker_container:
+        name: gitlab
+        hostname: gitlab.example.com
+        image: gitlab/gitlab-ce:latest
+        volumes:
+          - /srv/gitlab/config:/etc/gitlab:Z
+          - /srv/gitlab/logs:/var/log/gitlab:Z
+          - /srv/gitlab/data:/var/opt/gitlab:Z
+        published_ports:
+          - 443:443 
+          - 80:80 
+          - 22:22
+        restart: yes        
+    #pendiente -> añadir fichero de configuracion de configuracion    
+
