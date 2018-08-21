@@ -1,11 +1,10 @@
 all:
-  # hosts:
-  #   vagrant-machine:
-  #     ansible_host: 127.0.0.1 
-  #     ansible_port: 2222 
-  #     ansible_user: vagrant 
-  #     ansible_ssh_private_key_file: ~/Escritorio/vagrant_sandbox/.vagrant/machines/default/virtualbox/private_key 
-  #     ansible_python_interpreter: /usr/bin/python3
+  hosts:
+    prod-server:
+      ansible_host: 45.77.56.24
+          ansible_port: 22
+          ansible_user: root
+          ansible_python_interpreter: /usr/bin/python3
   children:
     dev-servers:
       hosts:      
