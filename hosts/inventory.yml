@@ -2,9 +2,10 @@ all:
   hosts:
     prod-server:
       ansible_host: 45.77.56.24
-          ansible_port: 22
-          ansible_user: root
-          ansible_python_interpreter: /usr/bin/python3
+      #basstech-spain-euro/web/app.php 
+      ansible_port: 22
+      ansible_user: root
+      ansible_python_interpreter: /usr/bin/python3
   children:
     dev-servers:
       hosts:      
@@ -12,10 +13,4 @@ all:
           ansible_host: 80.211.88.232
           ansible_port: 22
           ansible_user: root      
-          ansible_python_interpreter: /usr/bin/python3
-        dev-server-1:
-          #arm64 no usado
-          ansible_host: 163.172.137.65
-          ansible_port: 22
-          ansible_user: root      
-          ansible_python_interpreter: /usr/bin/python3
+          ansible_python_interpreter: /usr/bin/python3        

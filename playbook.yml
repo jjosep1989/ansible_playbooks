@@ -27,6 +27,8 @@
       swapfile_size: 3GB
       swapfile_swappiness: 70
   tasks:
+    # - debug:
+    #     msg: "{{ hostvars['dev-server-0'].ansible_host }}"
     - name: Instalacion de htop
       apt:
         name: htop
@@ -37,16 +39,18 @@
     - name: Creacion del contenedor de gitlab
       docker_container:
         name: gitlab
-        hostname: gitlab.example.com
+        hostname: "{{ hostvars['dev-server-0'].ansible_host }}"        
         image: gitlab/gitlab-ce:latest
+        env:
+          #las configuraciones deben estar comentadas en /srv/gitlab/config/gitlab.rb
+          GITLAB_OMNIBUS_CONFIG: "gitlab_rails['gitlab_shell_ssh_port']=1022;sidekiq['concurrency']=1;unicorn['worker_processes']=2;postgresql['shared_buffers']='256MB'"
         volumes:
           - /srv/gitlab/config:/etc/gitlab:Z
           - /srv/gitlab/logs:/var/log/gitlab:Z
           - /srv/gitlab/data:/var/opt/gitlab:Z
         published_ports:
-          - 443:443 
-          - 80:80 
-          - 22:22
-        restart: yes        
-    #pendiente -> añadir fichero de configuracion de configuracion    
+          - "443:443"
+          - "80:80"
+          - "1022:22"
+        restart: yes            
 
